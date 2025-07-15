@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
@@ -17,30 +18,31 @@ export class Movie {
   title: string;
 
   @Column({ nullable: true })
-  description: string;
+  description?: string;
 
   @Column({ nullable: true })
-  genre: string;
+  genre?: string;
 
   @Column({ nullable: true })
-  director: string;
+  director?: string;
 
   @Column({ nullable: true })
-  releaseYear: number;
+  releaseYear?: number;
 
-  @Column({ nullable: true })
-  rating: number;
+  @Column({ type: 'decimal', precision: 3, scale: 1, nullable: true })
+  rating?: number;
 
   @Column({ default: false })
   isWatched: boolean;
 
   @Column({ nullable: true })
-  watchedAt: Date;
+  review?: string;
 
-  @Column({ nullable: true })
-  review: string;
+  @Column({ type: 'timestamp', nullable: true })
+  watchedAt?: Date;
 
-  @ManyToOne(() => User, (user) => user.movies)
+  @ManyToOne(() => User, (user) => user.movies, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
   user: User;
 
   @CreateDateColumn()
