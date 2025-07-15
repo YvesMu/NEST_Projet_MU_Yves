@@ -1,33 +1,47 @@
 import { Controller, Post, Get, Body, HttpCode, HttpStatus, Query, Res } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { Verify2FaDto } from './dto/verify-2fa.dto';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @ApiOperation({ summary: 'Inscription d\'un nouvel utilisateur' })
+  @ApiResponse({ status: 201, description: 'Utilisateur créé avec succès' })
+  @ApiResponse({ status: 409, description: 'Email déjà utilisé' })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Connexion utilisateur' })
+  @ApiResponse({ status: 200, description: 'Code 2FA envoyé par email' })
+  @ApiResponse({ status: 401, description: 'Identifiants invalides' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
 
   @Post('verify-2fa')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Validation du code 2FA' })
+  @ApiResponse({ status: 200, description: 'Authentification réussie, token JWT retourné' })
+  @ApiResponse({ status: 401, description: 'Code 2FA invalide ou expiré' })
   async verify2FA(@Body() verify2FaDto: Verify2FaDto) {
     return this.authService.verify2FA(verify2FaDto);
   }
 
   // Endpoint GET pour vérification email (clic sur lien)
   @Get('verify-email')
+  @ApiOperation({ summary: 'Vérification email via lien (GET)' })
+  @ApiQuery({ name: 'token', description: 'Token de vérification' })
+  @ApiQuery({ name: 'email', description: 'Email à vérifier' })
   async verifyEmailGet(
     @Query('token') token: string, 
     @Query('email') email: string,
@@ -149,6 +163,9 @@ export class AuthController {
   // Endpoint POST pour vérification email (API)
   @Post('verify-email')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Vérification email via API (POST)' })
+  @ApiResponse({ status: 200, description: 'Email vérifié avec succès' })
+  @ApiResponse({ status: 400, description: 'Token de vérification invalide' })
   async verifyEmailPost(@Query('token') token: string, @Query('email') email: string) {
     return this.authService.verifyEmail(token, email);
   }

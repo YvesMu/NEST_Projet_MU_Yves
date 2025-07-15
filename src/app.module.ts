@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { EmailModule } from './email/email.module';
+import { MoviesModule } from './movies/movies.module';
 import { User } from './users/entities/user.entity';
 import { Movie } from './movies/entities/movie.entity';
 
@@ -19,14 +20,15 @@ import { Movie } from './movies/entities/movie.entity';
       host: process.env.DATABASE_HOST || 'localhost',
       port: parseInt(process.env.DATABASE_PORT || '5432'),
       username: process.env.DATABASE_USERNAME || 'postgres',
-      password: process.env.DATABASE_PASSWORD || 'root',
-      database: process.env.DATABASE_NAME || 'NestJS',
+      password: process.env.DATABASE_PASSWORD || 'postgres',
+      database: process.env.DATABASE_NAME || 'movie_watchlist',
       entities: [User, Movie],
       synchronize: true,
     }),
     UsersModule,
     AuthModule,
     EmailModule,
+    MoviesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
